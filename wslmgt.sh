@@ -151,7 +151,18 @@ function list_vhdx_usage() {
   while read -r vhdx_file; do
     filename=$(basename "$vhdx_file")
     parent1="$(dirname "$vhdx_file")"
+    # c:\Users\forretp\AppData\Local\Packages\CanonicalGroupLimited.Ubuntu20.04LTS_79rhkp1fndgsc\LocalState\
     parent2="$(dirname "$parent1")"
+    # c:\Users\forretp\AppData\Local\Packages\CanonicalGroupLimited.Ubuntu20.04LTS_79rhkp1fndgsc\
+    parent3="$(dirname "$parent2")"
+    # c:\Users\forretp\AppData\Local\Packages\
+    parent4="$(dirname "$parent3")"
+    # c:\Users\forretp\AppData\Local\
+    parent5="$(dirname "$parent4")"
+    # c:\Users\forretp\AppData\
+    parent6="$(dirname "$parent5")"
+    # c:\Users\forretp\
+    user="$(basename "$parent6")"
     diskname="$(basename "$parent2" | tr '_' '.' | cut -d'.' -f2-3 | sed 's/LTS//')"
     disksize="$(du -sh "$parent1" 2>/dev/null | awk '{print $1}')"
     echo "$disksize : $diskname : $filename : $user"
