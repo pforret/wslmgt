@@ -23,7 +23,7 @@ flag|V|VERBOSE|also show debug messages
 flag|f|FORCE|do not ask for confirmation (always yes)
 option|L|LOG_DIR|folder for log files |$HOME/log/$script_prefix
 option|T|TMP_DIR|folder for temp files|/tmp/$script_prefix
-choice|1|action|action to perform|list,action2,check,env,update
+choice|1|action|action to perform|list,shrink,check,env,update
 param|?|input|input file/text
 " -v -e '^#' -e '^\s*$'
 }
@@ -41,35 +41,38 @@ function Script:main() {
   list)
     #TIP: use «$script_prefix list» to ...
     #TIP:> $script_prefix list
-    Os:require wsl.exe
     IO:announce "WSL Volumes: actual size on disk"
     list_vhdx_disks
 
-    IO:announce "WSL Image: use disk space"
+    IO:announce "WSL Images : used disk space"
     local image wsl_version
     for image in $(list_installed_wsl_images); do
+      IO:debug "Process $image"
       wsl_version=$(wsl.exe --list --verbose | cleanup_windows | cut -c3- | grep -i "$image" | awk '{print $3}')
       case $wsl_version in
       1)
-        IO:alert "WSL$wsl_version: doesn't have an external VHDX disk"
+        IO:debug "Detected WSL1"
+        IO:alert "$image is WSL$wsl_version: no VHDX disk that can be shrunk"
         ;;
       2)
-        userfolder=$(wsl.exe --system -d "$image" find /home -maxdepth 1 -mindepth 1 | head -1)
-        wsluser=$(basename "$userfolder")
+        IO:debug "Detected WSL2"
+        # wsluser="$(wsl.exe -d "$image" whoami)"
+        wsluser="<user>"
         wsl.exe --system -d "$image" df -H /mnt/wslg/distro | awk -v image="$image" -v user="$wsluser" ' NR > 1 { print $3 " : " image " : " $1 ": " user}'
         ;;
       *)
-        echo "No version number found"
+        IO:alert "No version number found"
         wsl.exe --list --verbose | cleanup_windows | cut -c3-
+        ;;
       esac
     done
 
     ;;
 
-  action2)
-    #TIP: use «$script_prefix action2» to ...
-    #TIP:> $script_prefix action2
-    do_action2
+  shrink)
+    #TIP: use «$script_prefix shrink» to ...
+    #TIP:> $script_prefix shrink
+    do_shrink
     ;;
 
   action3)
@@ -113,34 +116,29 @@ function cleanup_windows() {
 }
 
 function list_installed_wsl_images() {
+  Os:require wsl.exe
   wsl.exe --list --quiet | cleanup_windows | grep -v 'docker-desktop' | sort
 }
 
 function list_vhdx_disks() {
   local user_folders user_folder vhdx_file
-  find /mnt/c/Users/ -maxdepth 2 -type d -name 'AppData' 2>/dev/null \
-  | while read -r user_folder; do
-    packages_folder="$user_folder/Local/Packages"
-    [[ ! -d "$packages_folder" ]] && continue
-    user="$(basename "$(dirname "$user_folder")")"
-    (
-      find "$packages_folder" -maxdepth 3 -type f -name '*.vhdx' 2>/dev/null # very fast
-    ) \
-    | while read -r vhdx_file; do
-      filename=$(basename "$vhdx_file")
-      parent1="$(dirname "$vhdx_file")"
-      parent2="$(dirname "$parent1")"
-      diskname="$(basename "$parent2" | tr '_' '.' | cut -d'.' -f2-3 | sed 's/LTS//')"
-      disksize="$(du -sh "$parent1" 2> /dev/null | awk '{print $1}')"
-      echo "$disksize : $diskname : $filename : $user"
+  find /mnt/c/Users/ -maxdepth 2 -type d -name 'AppData' 2>/dev/null |
+    while read -r user_folder; do
+      packages_folder="$user_folder/Local/Packages"
+      [[ ! -d "$packages_folder" ]] && continue
+      user="$(basename "$(dirname "$user_folder")")"
+      (
+        find "$packages_folder" -maxdepth 3 -type f -name '*.vhdx' 2>/dev/null # very fast
+      ) |
+        while read -r vhdx_file; do
+          filename=$(basename "$vhdx_file")
+          parent1="$(dirname "$vhdx_file")"
+          parent2="$(dirname "$parent1")"
+          diskname="$(basename "$parent2" | tr '_' '.' | cut -d'.' -f2-3 | sed 's/LTS//')"
+          disksize="$(du -sh "$parent1" 2>/dev/null | awk '{print $1}')"
+          echo "$disksize : $diskname : $filename : $user"
+        done
     done
-  done
-}
-
-function do_action2() {
-  IO:log "action2"
-  # (code)
-
 }
 
 #####################################################################
