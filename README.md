@@ -38,9 +38,10 @@ $ wslmgt list
 ```bash
 $ wslmgt shrink
  
-Run the following in a Powershell (Run As Administrator):
-(don't type the '>' and whatever's in front of it, your Powershell will show this)
+# Run the following in a Powershell (Run As Administrator):
+# (don't type the '>' and whatever's in front of it, your Powershell will show this)
 PS C:\WINDOWS\system32> wsl.exe --shutdown
+
 PS C:\WINDOWS\system32> diskpart
 DISKPART> select vdisk file=c:\Users\[user]\AppData\Local\Packages\[...Ubuntu20.04LTS_...]\LocalState\ext4.vhdx
 

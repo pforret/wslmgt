@@ -71,8 +71,8 @@ function Script:main() {
   shrink)
     #TIP: use «$script_prefix shrink» to shrink WSL volumes
     #TIP:> $script_prefix shrink
-    echo "Run the following in a Powershell (Run As Administrator):"
-    echo "(don't type the '>' and whatever's in front of it, your Powershell will show this)"
+    echo "# Run the following in a Powershell (Run As Administrator):"
+    echo "# (don't type the '>' and whatever's in front of it, your Powershell will show this)"
     echo "PS C:\WINDOWS\system32> wsl.exe --shutdown"
     echo "PS C:\WINDOWS\system32> diskpart"
     for disk in $(list_vhdx_disks); do
