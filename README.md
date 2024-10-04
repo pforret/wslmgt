@@ -23,7 +23,7 @@ Flags, options and parameters:
 ## wslmgt list
 
 ```bash
-$ ./wslmgt list
+$ wslmgt list
 ⏳  WSL Volumes: actual size on disk
 56G : Ubuntu20.04 : ext4.vhdx : [windows user]
 28G : Ubuntu22.04 : ext4.vhdx : [windows user]
@@ -36,7 +36,7 @@ $ ./wslmgt list
 ## wslmgt shrink
 
 ```bash
-./wslmgt shrink
+$ wslmgt shrink
  
 Run the following in a Powershell (Run As Administrator):
 (don't type the '>' and whatever's in front of it, your Powershell will show this)
