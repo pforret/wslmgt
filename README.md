@@ -20,7 +20,7 @@ Flags, options and parameters:
     <input>          : [parameter] input file/text (optional)
 ```
 
-## Example
+## wslmgt list
 
 ```bash
 $ ./wslmgt list
@@ -31,4 +31,21 @@ $ ./wslmgt list
 41G : Ubuntu-20.04 : /dev/sdf: <user>
 28G : Ubuntu-22.04 : /dev/sde: <user>
 ✴️: Ubuntu-24.04 is WSL1: no VHDX disk that can be shrunk
+```
+
+## wslmgt shrink
+
+```console
+> ./wslmgt shrink
+Run the following in a Powershell (Run As Administrator):
+(don't type the '>' and whatever's in front of it, your Powershell will show this)
+PS C:\WINDOWS\system32> wsl.exe --shutdown
+PS C:\WINDOWS\system32> diskpart
+DISKPART> select vdisk file=c:/Users/forretp/AppData/Local/Packages/CanonicalGroupLimited.Ubuntu20.04LTS_79rhkp1fndgsc/LocalState/ext4.vhdx
+DISKPART> compact vdisk
+
+DISKPART> select vdisk file=c:/Users/forretp/AppData/Local/Packages/CanonicalGroupLimited.Ubuntu22.04LTS_79rhkp1fndgsc/LocalState/ext4.vhdx
+DISKPART> compact vdisk
+
+DISKPART> exit
 ```
