@@ -23,7 +23,7 @@ flag|V|VERBOSE|also show debug messages
 flag|f|FORCE|do not ask for confirmation (always yes)
 option|L|LOG_DIR|folder for log files |$HOME/log/$script_prefix
 option|T|TMP_DIR|folder for temp files|/tmp/$script_prefix
-choice|1|action|action to perform|list,shrink,check,env,update
+choice|1|action|action to perform|list,shrink,clean,check,env,update
 param|?|input|input file/text
 " -v -e '^#' -e '^\s*$'
 }
@@ -42,7 +42,7 @@ function Script:main() {
     #TIP: use «$script_prefix list» to ...
     #TIP:> $script_prefix list
     IO:announce "WSL Volumes: actual size on disk"
-    list_vhdx_disks
+    list_vhdx_usage
 
     IO:announce "WSL Images : used disk space"
     local image wsl_version
@@ -56,8 +56,7 @@ function Script:main() {
         ;;
       2)
         IO:debug "Detected WSL2"
-        # wsluser="$(wsl.exe -d "$image" whoami)"
-        wsluser="<user>"
+        wsluser="$(wsl.exe -d "$image" whoami)"
         wsl.exe --system -d "$image" df -H /mnt/wslg/distro | awk -v image="$image" -v user="$wsluser" ' NR > 1 { print $3 " : " image " : " $1 ": " user}'
         ;;
       *)
@@ -70,16 +69,31 @@ function Script:main() {
     ;;
 
   shrink)
-    #TIP: use «$script_prefix shrink» to ...
+    #TIP: use «$script_prefix shrink» to shrink WSL volumes
     #TIP:> $script_prefix shrink
-    do_shrink
+    echo "Run the following in a Powershell (Run As Administrator):"
+    echo "1) 'wsl.exe --shutdown'"
+    echo "2) 'diskpart'"
+    for disk in $(list_vhdx_disks); do
+      dos_path=$(echo "$disk" | sed 's|/mnt/\([a-z]\)|\1:|')
+      echo "select vdisk file=$dos_path"
+      echo "compact vdisk"
+      echo " "
+    done
     ;;
 
-  action3)
-    #TIP: use «$script_prefix action3» to ...
-    #TIP:> $script_prefix action3
-    # Os:require "convert" "imagemagick"
-    # CONVERT $input $output
+  clean)
+    #TIP: use «$script_prefix clean» to clean up docker dangling/unused volumes
+    #TIP:> $script_prefix clean
+    # cf https://stackoverflow.com/questions/70946140/docker-desktop-wsl-ext4-vhdx-too-large
+    IO:announce "Remove unused volumes"
+    docker system prune -a
+    local volumes
+    volumes="$(docker volume ls -q -f dangling=true)"
+    if [[ -n "$volumes" ]]; then
+      IO:announce "Remove dangling volumes"
+      docker volume rm $volumes
+    fi
     ;;
 
   check | env)
@@ -126,19 +140,20 @@ function list_vhdx_disks() {
     while read -r user_folder; do
       packages_folder="$user_folder/Local/Packages"
       [[ ! -d "$packages_folder" ]] && continue
-      user="$(basename "$(dirname "$user_folder")")"
-      (
-        find "$packages_folder" -maxdepth 3 -type f -name '*.vhdx' 2>/dev/null # very fast
-      ) |
-        while read -r vhdx_file; do
-          filename=$(basename "$vhdx_file")
-          parent1="$(dirname "$vhdx_file")"
-          parent2="$(dirname "$parent1")"
-          diskname="$(basename "$parent2" | tr '_' '.' | cut -d'.' -f2-3 | sed 's/LTS//')"
-          disksize="$(du -sh "$parent1" 2>/dev/null | awk '{print $1}')"
-          echo "$disksize : $diskname : $filename : $user"
-        done
+      find "$packages_folder" -maxdepth 3 -type f -name '*.vhdx' 2>/dev/null
     done
+}
+
+function list_vhdx_usage() {
+    list_vhdx_disks |
+  while read -r vhdx_file; do
+    filename=$(basename "$vhdx_file")
+    parent1="$(dirname "$vhdx_file")"
+    parent2="$(dirname "$parent1")"
+    diskname="$(basename "$parent2" | tr '_' '.' | cut -d'.' -f2-3 | sed 's/LTS//')"
+    disksize="$(du -sh "$parent1" 2>/dev/null | awk '{print $1}')"
+    echo "$disksize : $diskname : $filename : $user"
+  done
 }
 
 #####################################################################
