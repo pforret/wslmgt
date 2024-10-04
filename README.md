@@ -35,26 +35,18 @@ $ ./wslmgt list
 
 ## wslmgt shrink
 
-
+```bash
 ./wslmgt shrink
  
 Run the following in a Powershell (Run As Administrator):
-
 (don't type the '>' and whatever's in front of it, your Powershell will show this)
-
 PS C:\WINDOWS\system32> **wsl.exe --shutdown**
-
 PS C:\WINDOWS\system32> **diskpart**
-
 DISKPART> **select vdisk file=c:\Users\[user]\AppData\Local\Packages\[...Ubuntu20.04LTS_...]\LocalState\ext4.vhdx**
-
 DiskPart successfully selected the virtual disk file.
-
 DISKPART> **compact vdisk**
-
   100 percent completed
-
 DiskPart successfully compacted the virtual disk file.
-
 DISKPART> **exit**
+```
 
