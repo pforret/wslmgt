@@ -41,10 +41,10 @@ Run the following in a Powershell (Run As Administrator):
 (don't type the '>' and whatever's in front of it, your Powershell will show this)
 PS C:\WINDOWS\system32> wsl.exe --shutdown
 PS C:\WINDOWS\system32> diskpart
-DISKPART> select vdisk file=c:/Users/forretp/AppData/Local/Packages/CanonicalGroupLimited.Ubuntu20.04LTS_79rhkp1fndgsc/LocalState/ext4.vhdx
+DISKPART> select vdisk file=c:/Users/[user]/AppData/Local/Packages/CanonicalGroupLimited.Ubuntu20.04LTS_79rhkp1fndgsc/LocalState/ext4.vhdx
 DISKPART> compact vdisk
 
-DISKPART> select vdisk file=c:/Users/forretp/AppData/Local/Packages/CanonicalGroupLimited.Ubuntu22.04LTS_79rhkp1fndgsc/LocalState/ext4.vhdx
+DISKPART> select vdisk file=c:/Users/[user]/AppData/Local/Packages/CanonicalGroupLimited.Ubuntu22.04LTS_79rhkp1fndgsc/LocalState/ext4.vhdx
 DISKPART> compact vdisk
 
 DISKPART> exit
