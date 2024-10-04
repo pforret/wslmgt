@@ -25,11 +25,11 @@ Flags, options and parameters:
 ```bash
 $ ./wslmgt list
 ⏳  WSL Volumes: actual size on disk
-56G : Ubuntu20.04 : ext4.vhdx : [user]
-28G : Ubuntu22.04 : ext4.vhdx : [user]
+56G : Ubuntu20.04 : ext4.vhdx : [windows user]
+28G : Ubuntu22.04 : ext4.vhdx : [windows user]
 ⏳  WSL Images : used disk space
-41G : Ubuntu-20.04 : /dev/sdf: <user>
-28G : Ubuntu-22.04 : /dev/sde: <user>
+41G : Ubuntu-20.04 : /dev/sdf: [wsl user]
+28G : Ubuntu-22.04 : /dev/sde: [wsl user]
 ✴️: Ubuntu-24.04 is WSL1: no VHDX disk that can be shrunk
 ```
 
